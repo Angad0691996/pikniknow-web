@@ -1,0 +1,1525 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PiknikNow - Your Travel Buddy</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        
+        body {
+            background: linear-gradient(to right, #fffbfb, #c2ffc6);
+            overflow-x: hidden;
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+            width: 100%;
+        }
+        .logo {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+    }
+
+    /* Logo Image Styling */
+    .logo-img {
+        width: 40px; /* Set width */
+        height: 40px; /* Set height */
+        object-fit: contain; /* Ensure the image scales properly */
+        border-radius: 8px; /* Rounded corners */
+        box-shadow: 0 2px 8px rgba(0,0,0,0.1); /* Soft shadow for depth */
+        transition: transform 0.3s ease;
+    }
+
+    .logo-img:hover {
+        transform: scale(1.1); /* Slight zoom effect on hover */
+    }
+
+    /* Logo Text Styling */
+    .logo-text {
+        font-size: 20px;
+        font-weight: bold;
+        color: #505D2C;
+        transition: color 0.3s ease;
+    }
+
+    .logo-text:hover {
+        color: #505D2C;
+    }
+        /* Header and Navigation */
+        header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 10px 0;
+            flex-wrap: wrap;
+        }
+        
+        .logo {
+            display: flex;
+            align-items: center;
+            font-weight: bold;
+            font-size: 24px;
+
+        }
+        
+        .logo-icon {
+            background-color: #505D2C;
+            color: white;
+            width: 32px;
+            height: 32px;
+            border-radius: 6px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-right: 10px;
+        }
+        
+        nav {
+            margin-left: auto;
+        }
+        
+        nav ul {
+            display: flex;
+            list-style: none;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+        
+        nav ul li {
+            margin: 0 15px;
+        }
+        
+        nav ul li a {
+            text-decoration: none;
+            color: #333;
+        }
+        
+        /* Mobile menu toggle */
+        .mobile-menu-toggle {
+            display: none;
+            cursor: pointer;
+            background: none;
+            border: none;
+            font-size: 24px;
+        }
+        
+        /* Hero Section */
+        .hero {
+            display: flex;
+            margin-top: 50px;
+            flex-wrap: wrap;
+        }
+        
+        .hero-content {
+            flex: 1;
+            padding-right: 20px;
+            min-width: 300px;
+        }
+        
+        .explore-btn {
+            display: inline-flex;
+            align-items: center;
+            background-color: white;
+            padding: 10px 20px;
+            border-radius: 30px;
+            margin-bottom: 30px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        
+        .explore-btn span {
+            color: #505D2C;
+            margin-right: 10px;
+            font-weight: 500;
+        }
+        
+        .explore-btn .circle {
+            width: 24px;
+            height: 24px;
+            background-color: #505D2C;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+        }
+        
+        .hero-title {
+            font-size: clamp(36px, 6vw, 64px);
+            font-weight: 800;
+            line-height: 1.1;
+            margin-bottom: 20px;
+        }
+        
+        .hero-title span {
+            color: #505D2C;
+        }
+        
+        .hero-subtitle {
+            color: #666;
+            margin-bottom: 30px;
+            line-height: 1.5;
+        }
+        
+        .cta-buttons {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 15px;
+            margin-bottom: 40px;
+        }
+        
+        .download-btn {
+            background-color: #505D2C;
+            color: white;
+            padding: 12px 24px;
+            border-radius: 30px;
+            text-decoration: none;
+            font-weight: 500;
+            display: flex;
+            align-items: center;
+            white-space: nowrap;
+        }
+        
+        .download-btn::after {
+            content: "→";
+            margin-left: 8px;
+        }
+        
+        .demo-btn {
+            display: flex;
+            align-items: center;
+            padding: 12px 24px;
+            border: 1px solid #ddd;
+            border-radius: 30px;
+            text-decoration: none;
+            color: #333;
+            white-space: nowrap;
+        }
+        
+        .demo-btn .circle {
+            width: 24px;
+            height: 24px;
+            background-color: #505D2C;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            margin-left: 8px;
+        }
+        
+        /* Image Gallery */
+        .image-gallery {
+            flex: 1;
+            position: relative;
+            height: 500px;
+            min-width: 300px;
+        }
+        
+        .gallery-image {
+            border-radius: 16px;
+            overflow: hidden;
+            position: absolute;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.1);
+        }
+        
+        .gallery-image img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+        
+        .image-1 {
+            width: 35%;
+            height: 36%;
+            top: 20%;
+            left: 0;
+        }
+        
+        .image-2 {
+            width: 30%;
+            height: 44%;
+            top: 0;
+            right: 5%;
+        }
+        
+        .image-3 {
+            width: 33%;
+            height: 44%;
+            bottom: 0;
+            right: 13%;
+        }
+        
+        .image-4 {
+            width: 30%;
+            height: 36%;
+            bottom: 10%;
+            left: 10%;
+        }
+        
+        /* Decoration Elements */
+        .decoration {
+            position: absolute;
+        }
+        
+        .airplane-1 {
+            top: 36%;
+            left: 50%;
+            color: #105d2c;
+            transform: rotate(45deg);
+        }
+        
+        .airplane-2 {
+            bottom: 24%;
+            right: 16%;
+            color: #505D2C;
+            transform: rotate(-45deg);
+        }
+        
+        .flight-path {
+            position: absolute;
+            border: 1px dashed #105d2c;
+            width: 30%;
+            height: 20%;
+            border-bottom: none;
+            border-left: none;
+            border-radius: 0 100px 0 0;
+            top: 32%;
+            left: 35%;
+        }
+        
+        .circle-yellow {
+            width: 36px;
+            height: 36px;
+            background-color: #fbbf24;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            position: absolute;
+            top: 20%;
+            right: 2%;
+        }
+        
+        .circle-blue {
+            width: 36px;
+            height: 36px;
+            background-color: #8dd69e;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            position: absolute;
+            bottom: 6%;
+            right: 36%;
+        }
+        
+        /* Responsive Design */
+        @media (max-width: 992px) {
+            .hero {
+                flex-direction: column;
+            }
+            
+            .hero-content {
+                padding-right: 0;
+                margin-bottom: 40px;
+            }
+            
+            .image-gallery {
+                height: 400px;
+            }
+        }
+        
+        @media (max-width: 768px) {
+            header {
+                justify-content: space-between;
+            }
+            
+            nav ul li {
+                margin: 0 10px;
+            }
+            
+            .hero-title {
+                font-size: 42px;
+            }
+            
+            .image-gallery {
+                height: 350px;
+            }
+        }
+        
+        @media (max-width: 576px) {
+            .mobile-menu-toggle {
+                display: block;
+                margin-left: auto;
+            }
+            
+            nav {
+                display: none;
+                width: 100%;
+                margin-top: 15px;
+            }
+            
+            nav.active {
+                display: block;
+            }
+            
+            nav ul {
+                flex-direction: column;
+                gap: 15px;
+            }
+            
+            nav ul li {
+                margin: 0;
+            }
+            
+            .hero-title {
+                font-size: 36px;
+            }
+            
+            .cta-buttons {
+                flex-direction: column;
+                width: 100%;
+            }
+            
+            .download-btn, .demo-btn {
+                width: 100%;
+                justify-content: center;
+            }
+            
+            .image-gallery {
+                height: 300px;
+            }
+            
+            .image-1 {
+                width: 40%;
+                height: 35%;
+                top: 20%;
+                left: 5%;
+            }
+            
+            .image-2 {
+                width: 35%;
+                height: 40%;
+                top: 5%;
+                right: 5%;
+            }
+            
+            .image-3 {
+                width: 38%;
+                height: 40%;
+                bottom: 5%;
+                right: 5%;
+            }
+            
+            .image-4 {
+                width: 35%;
+                height: 35%;
+                bottom: 5%;
+                left: 5%;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <div class="logo">
+                <img src="asset/AppLogo/2.png" alt="Travelo Logo" class="logo-img">
+                <span class="logo-text"></span>
+            </div>
+        
+            <!-- <nav>
+                <ul>
+                    <li><a href="#">Home</a></li>
+                    <li><a href="#">Discover</a></li>
+                    <li><a href="#">Special Deals</a></li>
+                    <li><a href="#">Support</a></li>
+                </ul>
+            </nav> -->
+        
+            <!-- <button class="mobile-menu-toggle">☰</button> -->
+        </header>
+        
+        <style>
+            /* Header Styling */
+            header {
+                display: flex;
+                justify-content: space-between;
+                align-items: center;
+                padding: 15px 20px;
+                background-color: transparent !important; /* Force removal of background */
+                box-shadow: none !important; /* Remove any shadow */
+                border: none;
+                position: relative;
+                z-index: 10;
+            }
+        
+            /* Logo Styling */
+            .logo {
+                display: flex;
+                align-items: center;
+                gap: 10px;
+            }
+        
+            .logo-img {
+                width: 270px;
+                height: auto;
+            }
+        
+            .logo-text {
+                font-size: 20px;
+                font-weight: bold;
+                color: #1e8a46;
+            }
+        
+            /* Navbar Styling */
+            nav {
+                background-color: transparent !important; /* Force removal of background */
+                box-shadow: none !important;
+                padding: 0;
+                margin: 0;
+            }
+        
+            nav ul {
+                display: flex;
+                list-style: none;
+                gap: 30px;
+                margin: 0;
+                padding: 0;
+            }
+        
+            nav ul li a {
+                text-decoration: none;
+                font-size: 16px;
+                color: #333;
+                font-weight: 500;
+                padding: 5px 0;
+                position: relative;
+                transition: color 0.3s ease;
+            }
+        
+            nav ul li a:hover {
+                color: #1e8a46;
+            }
+        
+            /* Underline effect on hover */
+            nav ul li a::after {
+                content: "";
+                display: block;
+                width: 0;
+                height: 2px;
+                background-color: #1c9147;
+                transition: width 0.3s ease;
+                position: absolute;
+                bottom: -2px;
+                left: 0;
+            }
+        
+            nav ul li a:hover::after {
+                width: 100%;
+            }
+        
+            /* Mobile Menu Button */
+            .mobile-menu-toggle {
+                display: none;
+                font-size: 24px;
+                background: none;
+                border: none;
+                cursor: pointer;
+                color: #333;
+            }
+        
+            /* Responsive Adjustments */
+            @media (max-width: 768px) {
+                .mobile-menu-toggle {
+                    display: block;
+                }
+        
+                nav {
+                    display: none;
+                    position: absolute;
+                    top: 60px;
+                    left: 0;
+                    width: 100%;
+                    background-color: white;
+                    z-index: 20;
+                    box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+                }
+        
+                nav.active {
+                    display: block;
+                }
+        
+                nav ul {
+                    flex-direction: column;
+                    gap: 15px;
+                    align-items: center;
+                }
+            }
+        </style>
+        
+        <script>
+            // Mobile menu toggle
+            document.querySelector('.mobile-menu-toggle').addEventListener('click', () => {
+                document.querySelector('nav').classList.toggle('active');
+            });
+        </script>
+        <!-- Hero Section -->
+        <section class="hero">
+            <div class="hero-content">
+                <div class="explore-btn">
+                    <span>Discover the world with PiknikNow!</span>
+                    <div class="circle">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <path d="M5 12h14"></path>
+                            <path d="m12 5 7 7-7 7"></path>
+                        </svg>
+                    </div>
+                </div>
+                
+                <h1 class="hero-title">
+                    Your <br>
+                    Next Adventure Begins with<br>
+                    <span>PiknikNow</span>
+                </h1>
+                
+                <p class="hero-subtitle">
+                    Explore unique destinations, share your travel stories, and connect with a global community of explorers — all in one app, now integrated with vehicle cockpits for real-time travel insights and guidance. </p>
+                
+                <div class="cta-buttons">
+                    <a href="#" class="download-btn" onclick="downloadAPK();">Get the App</a>
+                    <a href="#" class="demo-btn">
+                        Watch Demo
+                        <div class="circle">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                <polygon points="5 3 19 12 5 21 5 3"></polygon>
+                            </svg>
+                        </div>
+                    </a>
+                </div>
+            </div>
+            
+            <div class="image-gallery">
+                <!-- Decoration Elements -->
+                <div class="flight-path"></div>
+                
+                <div class="decoration airplane-1">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M17.8 19.2 16 11l3.5-3.5C21 6 21.5 4 21 3c-1-.5-3 0-4.5 1.5L13 8 4.8 6.2c-.5-.1-.9.1-1.1.5l-.3.5c-.2.5-.1 1 .3 1.3L9 12l-2 3H4l-1 1 3 2 2 3 1-1v-3l3-2 3.5 5.3c.3.4.8.5 1.3.3l.5-.2c.4-.3.6-.7.5-1.2z"></path>
+                    </svg>
+                </div>
+                
+                <div class="decoration airplane-2">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M17.8 19.2 16 11l3.5-3.5C21 6 21.5 4 21 3c-1-.5-3 0-4.5 1.5L13 8 4.8 6.2c-.5-.1-.9.1-1.1.5l-.3.5c-.2.5-.1 1 .3 1.3L9 12l-2 3H4l-1 1 3 2 2 3 1-1v-3l3-2 3.5 5.3c.3.4.8.5 1.3.3l.5-.2c.4-.3.6-.7.5-1.2z"></path>
+                    </svg>
+                </div>
+                
+                <div class="circle-yellow">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <polygon points="5 3 19 12 5 21 5 3"></polygon>
+                    </svg>
+                </div>
+                
+                <div class="circle-blue">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0Z"></path>
+                        <circle cx="12" cy="10" r="3"></circle>
+                    </svg>
+                </div>
+                
+                <!-- Images -->
+                <div class="gallery-image image-2">
+                    <img src="asset/1.png" alt="User exploring travel destinations">
+                </div>
+                
+                <div class="gallery-image image-3">
+                    <img src="asset/2.png" alt="AI-driven travel recommendations">
+                </div>
+                
+                <div class="gallery-image image-4">
+                    <img src="asset/3.png" alt="Community of travelers sharing experiences">
+                </div>
+            </div>
+        </section>
+    </div>
+    <section class="travel-point">
+        <div class="travel-point-wrapper">
+            <div class="travel-point-container">
+                <div class="travel-point-image-container">
+                    <div class="green-semicircle"></div>
+                    <div class="small-circles">
+                        <div class="small-circle teal"></div>
+                        <div class="small-circle bright-green"></div>
+                        <div class="small-circle red-top"></div>
+                        <div class="small-circle red-bottom"></div>
+                    </div>
+                    <img class="traveler-img" src="asset/asian.png" alt="PiknikNow App Screenshot" />
+                </div>
+                <div class="travel-point-content">
+                    <h4 class="travel-point-tagline">PIKNIKNOW</h4>
+                    <h2 class="travel-point-title">Explore, Share, and Connect with PiknikNow</h2>
+                    <p class="travel-point-subtitle">
+                        Discover hidden destinations, share your travel experiences, and connect with fellow explorers using PiknikNow.
+                    </p>
+                    <div class="travel-point-stats">
+                        <div class="stat-card">
+                            <h3>300+</h3>
+                            <p>Travel Destinations</p>
+                        </div>
+                        <div class="stat-card">
+                            <h3>500+</h3>
+                            <p>User Stories Shared</p>
+                        </div>
+                        <div class="stat-card">
+                            <h3>50+</h3>
+                            <p>Local Businesses</p>
+                        </div>
+                        <div class="stat-card">
+                            <h3>15k+</h3>
+                            <p>Happy Travelers</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+    
+    
+    <style>
+        /* Travel Point Section Styling */
+        .travel-point {
+    background-color: white;
+    color: #333;
+    font-family: 'Arial', sans-serif;
+    overflow: hidden;
+    position: relative;
+}
+    
+.travel-point-wrapper {
+    position: relative;
+    overflow: hidden;
+}
+    
+.travel-point-container {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 40px;
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 60px 20px;
+    position: relative;
+}
+    
+        /* Image and background elements */
+        .travel-point-image-container {
+    position: relative;
+    width: 45%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+       /* Adjust the green semicircle */
+       .green-semicircle {
+    position: absolute;
+    width: 140%;
+    height: 140%;
+    background-color: #2c9e3f;
+    border-radius: 50%;
+    left: -40%;
+    z-index: 1;
+}
+
+/* Reposition the small circles */
+        .small-circle.teal {
+            width: 50px;
+            height: 50px;
+            background-color: #4ecdc4;
+            top: 15%;
+            left: 5%;
+        }
+
+        .small-circle.bright-green {
+            width: 70px;
+            height: 70px;
+            background-color: #2ecc40;
+            top: 5%;
+            right: 20%;
+        }
+
+        .small-circle.red-top {
+            width: 40px;
+            height: 40px;
+            background-color: #e74c3c;
+            top: 30%;
+            right: 10%;
+        }
+
+        .small-circle.red-bottom {
+            width: 50px;
+            height: 50px;
+            background-color: #e74c3c;
+            bottom: 30%;
+            right: 15%;
+        }
+
+/* Adjust the image container */
+        .travel-point-image-container {
+            position: relative;
+            width: 48%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            overflow: visible;
+        }
+
+/* Make sure the image is properly sized and positioned */
+.traveler-img {
+    width: 85%;
+    position: relative;
+    z-index: 3;
+    display: block;
+}
+    
+.small-circles .small-circle {
+    position: absolute;
+    border-radius: 50%;
+    z-index: 2;
+}
+.small-circle.teal {
+    width: 40px;
+    height: 40px;
+    background-color: #4ecdc4;
+    top: 15%;
+    left: -5%;
+}
+    
+.small-circle.bright-green {
+    width: 60px;
+    height: 60px;
+    background-color: #2ecc40;
+    top: 5%;
+    right: 10%;
+}
+    
+.small-circle.red-top {
+    width: 30px;
+    height: 30px;
+    background-color: #e74c3c;
+    top: 30%;
+    right: 5%;
+}
+
+    
+.small-circle.red-bottom {
+    width: 40px;
+    height: 40px;
+    background-color: #e74c3c;
+    bottom: 30%;
+    right: 15%;
+}
+
+    
+.traveler-img {
+    width: 90%;
+    position: relative;
+    z-index: 3;
+    display: block;
+}
+
+    
+.travel-point-content {
+    width: 50%;
+    z-index: 5;
+    position: relative;
+}
+    
+.travel-point-tagline {
+    font-size: 18px;
+    font-weight: bold;
+    margin-bottom: 10px;
+    color: #2c9e3f;
+    letter-spacing: 1px;
+}
+
+    
+.travel-point-title {
+    font-size: 42px;
+    font-weight: bold;
+    margin-bottom: 20px;
+    color: #333;
+    line-height: 1.2;
+}
+    
+.travel-point-subtitle {
+    font-size: 18px;
+    line-height: 1.5;
+    margin-bottom: 40px;
+    color: #777;
+}
+
+    
+.travel-point-stats {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 20px;
+}
+.stat-card {
+    background-color: #f8f8f8;
+    padding: 20px;
+    border-radius: 12px;
+    text-align: center;
+    box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.05);
+}
+    
+.stat-card h3 {
+    font-size: 36px;
+    font-weight: bold;
+    margin-bottom: 5px;
+    color: #2c9e3f;
+}
+        .stat-card p {
+            font-size: 16px;
+            color: #777;
+        }
+    
+        /* Responsive Adjustments */
+        @media (max-width: 992px) {
+            .travel-point-container {
+                flex-direction: column;
+                gap: 40px;
+            }
+    
+            .travel-point-content,
+            .travel-point-image-container {
+                width: 100%;
+                max-width: 600px;
+                margin: 0 auto;
+            }
+    
+            .green-semicircle {
+                width: 200%;
+                height: 200%;
+                left: -50%;
+            }
+    
+            .travel-point-stats {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+    
+        @media (max-width: 576px) {
+            .travel-point-stats {
+                grid-template-columns: 1fr;
+            }
+    
+            .travel-point-title {
+                font-size: 32px;
+            }
+        }
+    </style>
+ <section class="key-features">
+    <div class="features-container">
+        <div class="features-content">
+            <h4 class="features-tagline">KEY FEATURES</h4>
+            <h2 class="features-title">Discover, Connect, and Explore with PiknikNow</h2>
+            <p class="features-subtitle">
+                PiknikNow brings your travel dreams to life — find the best destinations, share your journey, and get real-time guidance right from your vehicle’s cockpit.
+            </p>
+            
+            <div class="feature-list">
+                <div class="feature-item">
+                    <div class="feature-icon green">
+                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <path d="M12 2a7 7 0 0 0-7 7c0 5 7 13 7 13s7-8 7-13a7 7 0 0 0-7-7z"></path>
+                            <circle cx="12" cy="9" r="3"></circle>
+                        </svg>
+                    </div>
+                    <div class="feature-text">
+                        <h3>AI-Driven Recommendations</h3>
+                        <p>Discover tailored travel suggestions based on your interests and location.</p>
+                    </div>
+                </div>
+                
+                <div class="feature-item">
+                    <div class="feature-icon orange">
+                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect>
+                            <line x1="16" y1="2" x2="16" y2="6"></line>
+                            <line x1="8" y1="2" x2="8" y2="6"></line>
+                            <line x1="3" y1="10" x2="21" y2="10"></line>
+                        </svg>
+                    </div>
+                    <div class="feature-text">
+                        <h3>Social Travel Network</h3>
+                        <p>Share your travel stories and connect with fellow explorers globally.</p>
+                         </div>
+                </div>
+                
+                <div class="feature-item">
+                    <div class="feature-icon green">
+                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <path d="M20 12V8H6a2 2 0 0 1 0-4h14v4"></path>
+                            <path d="M20 12v4H6a2 2 0 0 0 0 4h14v-4"></path>
+                        </svg>
+                    </div>
+                    <div class="feature-text">
+                        <h3>Real-Time Cockpit Integration</h3>
+                        <p>Get real-time travel guidance and insights directly from your vehicle's cockpit.</p>
+                   
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="features-images">
+            <div class="image-wrapper">
+                <div class="image-main">
+                    <img src="asset/8.png" alt="Travel exploration" />
+                </div>
+                <div class="image-secondary">
+                    <img src="asset/9.png" alt="Social connection" />
+                </div>
+                <div class="decoration-circle"></div>
+                <div class="decoration-pattern"></div>
+            </div>
+        </div>
+    </div>
+</section>
+
+
+<style>
+    /* Key Features Section Styling */
+    body {
+        margin: 0;
+        padding: 0;
+    }
+    
+    /* Top Green Header - Separate from the features section */
+    .top-header {
+        background-color: #2C9E3F;
+        height: 150px; /* Adjust height as needed */
+        width: 100%;
+        position: relative;
+    }
+    
+    /* Create the curved edge for the green header */
+    .top-header::after {
+        content: '';
+        position: absolute;
+        bottom: -100px;
+        right: 0;
+        height: 100px;
+        width: 100%;
+        background-color: #ffffff;
+        border-top-left-radius: 100%;
+    }
+    
+    .key-features {
+        position: relative;
+        font-family: 'Arial', sans-serif;
+        max-width: 1200px;
+        margin: 0 auto;
+        padding: 0;
+        background: #ffffff; /* Pure white background */
+    }
+    
+    .features-container {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 60px 40px;
+        position: relative;
+        overflow: hidden;
+        background: transparent;
+    }
+    
+    /* Decorative elements */
+    .decoration-pattern {
+        position: absolute;
+        top: -30px;
+        right: 30px;
+        width: 180px;
+        height: 180px;
+        background-image: radial-gradient(#FFC107 1.5px, transparent 1.5px);
+        background-size: 15px 15px;
+        z-index: 1;
+        opacity: 0.6;
+    }
+    
+    .decoration-circle {
+        position: absolute;
+        width: 130px;
+        height: 130px;
+        border: 3px dashed #FF5722;
+        border-radius: 50%;
+        top: -40px;
+        right: 60px;
+        z-index: 1;
+        opacity: 0.8;
+    }
+    
+    /* Content section */
+    .features-content {
+        width: 50%;
+        padding-right: 40px;
+    }
+    
+    .features-tagline {
+        font-size: 18px;
+        font-weight: bold;
+        margin-bottom: 10px;
+        color: #2C9E3F;
+        letter-spacing: 1px;
+        text-transform: uppercase;
+    }
+    
+    .features-title {
+        font-size: 42px;
+        font-weight: bold;
+        margin-bottom: 20px;
+        color: #333;
+        line-height: 1.1;
+    }
+    
+    .features-subtitle {
+        font-size: 16px;
+        line-height: 1.5;
+        margin-bottom: 40px;
+        color: #777;
+    }
+    
+    /* Feature list */
+    .feature-list {
+        display: flex;
+        flex-direction: column;
+        gap: 25px;
+    }
+    
+    .feature-item {
+        display: flex;
+        align-items: center;
+        gap: 15px;
+        padding: 5px 0;
+    }
+    
+    .feature-icon {
+        width: 56px;
+        height: 56px;
+        border-radius: 12px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        flex-shrink: 0;
+        box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+    }
+    
+    .feature-icon svg {
+        width: 28px;
+        height: 28px;
+        stroke: white;
+    }
+    
+    .feature-icon.green {
+        background-color: #2C9E3F;
+    }
+    
+    .feature-icon.orange {
+        background-color: #FF7E36;
+    }
+    
+    .feature-text h3 {
+        font-size: 18px;
+        font-weight: bold;
+        margin-bottom: 5px;
+        color: #333;
+    }
+    
+    .feature-text p {
+        font-size: 14px;
+        color: #777;
+        margin: 0;
+    }
+    
+    /* Images section */
+    .features-images {
+        width: 50%;
+        position: relative;
+        padding-left: 20px;
+    }
+    
+    .image-wrapper {
+        position: relative;
+        width: 350px;
+        height: 417px;
+        margin-left: auto;
+    }
+    
+    .image-main {
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 65%;
+        height: 60%;
+        border-radius: 15px;
+        overflow: hidden;
+        z-index: 2;
+        box-shadow: 0 8px 24px rgba(0,0,0,0.15);
+    }
+    
+    .image-secondary {
+        position: absolute;
+        bottom: 0;
+        right: 0;
+        width: 65%;
+        height: 60%;
+        border-radius: 15px;
+        overflow: hidden;
+        z-index: 3;
+        box-shadow: 0 8px 24px rgba(0,0,0,0.15);
+    }
+    
+    .image-main img, .image-secondary img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+    }
+    
+    /* Responsive adjustments */
+    @media (max-width: 992px) {
+        .features-container {
+            flex-direction: column;
+            padding: 40px 30px;
+        }
+        
+        .features-content, .features-images {
+            width: 100%;
+        }
+        
+        .features-content {
+            padding-right: 0;
+            margin-bottom: 40px;
+        }
+        
+        .image-wrapper {
+            margin: 0 auto;
+        }
+    }
+    
+    @media (max-width: 576px) {
+        .features-title {
+            font-size: 32px;
+        }
+        
+        .image-wrapper {
+            width: 300px;
+            height: 357px;
+        }
+    }
+</style>
+
+<!-- Added HTML for the page structure -->
+<footer>
+    <div class="footer-container">
+        <div class="footer-left">
+            <div class="footer-logo">
+                <img src="asset/AppLogo/DashBoardLogo2.png" alt="PiknikNow Logo" class="footer-logo-icon" />
+                <img src="asset/sam1.png" alt="Secondary Logo" class="footer-logo-icon" />
+            </div>
+            
+            <p class="footer-description">PiknikNow is a travel-focused social platform that connects explorers with authentic experiences and AI-driven recommendations. It allows users to discover hidden gems, share travel stories, and connect with fellow travelers.</p>
+            
+            <div class="download-section">
+                <h3 class="footer-heading">Download App</h3>
+                <div class="app-stores">
+                    <a href="https://drive.google.com/uc?export=download&id=1WA-xtsO30i2ve4_ZrqP45GvO6N1Zai7G" class="app-store-link">
+                        <div class="app-store-button">
+                            <img src="https://cdnjs.cloudflare.com/ajax/libs/simple-icons/11.1.0/apple.svg" alt="App Store" class="store-icon">
+                            <div class="store-text">
+                                <span class="store-small-text">Download on the</span>
+                                <span class="store-large-text">App Store</span>
+                            </div>
+                        </div>
+                    </a>
+                    <a href="https://drive.google.com/uc?export=download&id=1WA-xtsO30i2ve4_ZrqP45GvO6N1Zai7G" class="app-store-link">
+                        <div class="app-store-button">
+                            <img src="https://cdnjs.cloudflare.com/ajax/libs/simple-icons/11.1.0/googleplay.svg" alt="Google Play" class="store-icon">
+                            <div class="store-text">
+                                <span class="store-small-text">GET IT ON</span>
+                                <span class="store-large-text">Google Play</span>
+                            </div>
+                        </div>
+                    </a>
+                </div>
+            </div>
+        </div>
+        
+        <div class="footer-right">
+            <div class="contact-section">
+                <h3 class="footer-heading">Get in Touch</h3>
+                <div class="contact-card">
+                    <div class="contact-group">
+                        <h4 class="contact-title">Email</h4>
+                        <a href="mailto:prashant@samsanlabs.com" class="contact-link">prashant@samsanlabs.com</a>
+                        <a href="mailto:saurabh.nalawade@samsanlabs.com" class="contact-link">saurabh.nalawade@samsanlabs.com</a>
+                    </div>
+                    
+                    <div class="contact-group">
+                        <h4 class="contact-title">Phone</h4>
+                        <a href="tel:9325504485" class="contact-link">+91 9325504485</a>
+                    </div>
+                    
+                    <div class="contact-group">
+                        <h4 class="contact-title">Address</h4>
+                        <address class="contact-address">
+                            SAMSAN Technische Labs Pvt. Ltd<br>
+                            #113, The Business Hub, Vandevi Corner,<br>
+                            Karvenagar, Kothrud,<br>
+                            Pune 411038 INDIA.
+                        </address>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</footer>
+
+<style>
+    /* Footer Styles */
+    footer {
+        background: linear-gradient(to right, #fffbfb, #c2ffc6);
+        padding: 60px 0;
+        width: 100%;
+        border-top: 1px solid #e8f5e9;
+        font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    }
+
+    .footer-container {
+        max-width: 1200px;
+        margin: 0 auto;
+        display: flex;
+        flex-wrap: wrap;
+        padding: 0 20px;
+        gap: 40px;
+        justify-content: space-between;
+    }
+
+    .footer-left {
+        flex: 1.5;
+        min-width: 300px;
+        padding-right: 30px;
+    }
+
+    .footer-right {
+        flex: 1;
+        min-width: 280px;
+    }
+
+    .footer-logo {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        margin-bottom: 20px;
+    }
+
+    .footer-logo-icon {
+        width: 150px;
+        height: auto;
+        object-fit: contain;
+    }
+
+    .footer-description {
+        color: #666;
+        line-height: 1.6;
+        margin-bottom: 30px;
+        font-size: 15px;
+    }
+
+    .footer-heading {
+        font-weight: bold;
+        margin-bottom: 20px;
+        color: #505D2C;
+        font-size: 18px;
+        position: relative;
+        display: inline-block;
+    }
+
+    .footer-heading:after {
+        content: '';
+        position: absolute;
+        bottom: -5px;
+        left: 0;
+        width: 40px;
+        height: 2px;
+        background-color: #505D2C;
+    }
+
+    /* Download Section */
+    .download-section {
+        margin-top: 30px;
+    }
+
+    .app-stores {
+        display: flex;
+        margin-top: 20px;
+        gap: 15px;
+    }
+
+    .app-store-link {
+        text-decoration: none;
+    }
+
+    .app-store-button {
+        padding: 12px 16px;
+        background-color: #505D2C;
+        color: white;
+        border-radius: 8px;
+        font-weight: 500;
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        box-shadow: 0 4px 12px rgba(80, 93, 44, 0.2);
+        transition: all 0.3s ease;
+        min-width: 150px;
+    }
+
+    .app-store-button:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 6px 16px rgba(80, 93, 44, 0.3);
+    }
+    
+    .store-icon {
+        width: 24px;
+        height: 24px;
+        fill: white;
+        filter: brightness(0) invert(1);
+    }
+    
+    .store-text {
+        display: flex;
+        flex-direction: column;
+        line-height: 1.2;
+    }
+    
+    .store-small-text {
+        font-size: 10px;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+    }
+    
+    .store-large-text {
+        font-size: 16px;
+        font-weight: 600;
+    }
+    
+    /* Enhanced Contact Section - No Icons */
+    .contact-section {
+        background-color: rgba(255, 255, 255, 0.7);
+        border-radius: 12px;
+        padding: 25px;
+        box-shadow: 0 4px 16px rgba(0, 0, 0, 0.06);
+    }
+    
+    .contact-card {
+        display: flex;
+        flex-direction: column;
+        gap: 20px;
+    }
+    
+    .contact-group {
+        margin-bottom: 5px;
+    }
+    
+    .contact-title {
+        margin: 0 0 10px 0;
+        font-size: 16px;
+        font-weight: 600;
+        color: #505D2C;
+        border-left: 3px solid #505D2C;
+        padding-left: 10px;
+    }
+    
+    .contact-link {
+        display: block;
+        color: #666;
+        text-decoration: none;
+        margin-bottom: 6px;
+        transition: color 0.3s;
+        font-size: 15px;
+        padding-left: 13px;
+    }
+    
+    .contact-link:hover {
+        color: #505D2C;
+    }
+    
+    .contact-address {
+        font-style: normal;
+        color: #666;
+        line-height: 1.6;
+        font-size: 15px;
+        padding-left: 13px;
+    }
+
+    @media (max-width: 992px) {
+        .footer-container {
+            gap: 30px;
+        }
+    }
+
+    @media (max-width: 768px) {
+        .footer-container {
+            flex-direction: column;
+        }
+
+        .footer-right {
+            width: 100%;
+        }
+        
+        .contact-section {
+            margin-top: 20px;
+        }
+    }
+
+    @media (max-width: 576px) {
+        .app-stores {
+            flex-direction: column;
+        }
+        
+        .footer-left, .footer-right {
+            padding: 0;
+        }
+    }
+</style>
+<script>
+    function downloadAPK() {
+        console.log("in download");
+        let link = document.createElement('a');
+        link.href = "https://drive.google.com/uc?export=download&id=1WA-xtsO30i2ve4_ZrqP45GvO6N1Zai7G";
+        link.setAttribute('download', 'PiknikNow.apk'); // Suggested file name
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+    }
+    </script>
+
+    <script>
+        // Simple mobile menu toggle
+        document.querySelector('.mobile-menu-toggle').addEventListener('click', function() {
+            document.querySelector('nav').classList.toggle('active');
+        });
+    </script>
+</body>
+</html>
