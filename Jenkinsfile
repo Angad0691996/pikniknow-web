@@ -2,35 +2,34 @@ pipeline {
     agent any
 
     environment {
+        REPO_URL = "https://github.com/Angad0691996/pikniknow-web.git"
         DEPLOY_DIR = "/var/www/pikniknow-web"
         NGINX_CONF = "/etc/nginx/sites-available/pikniknow-web"
+        NGINX_SITE_LINK = "/etc/nginx/sites-enabled/pikniknow-web"
     }
 
     stages {
         stage('Checkout Code') {
             steps {
-                git credentialsId: 'github-credentials', url: 'https://github.com/Angad0691996/pikniknow-web..git', branch: 'main'
+                git credentialsId: 'github-credentials', url: "${REPO_URL}", branch: 'main'
             }
         }
 
         stage('Install Nginx if Missing') {
             steps {
                 script {
-                    sh """
-                        if ! command -v nginx > /dev/null; then
-                            echo "🔧 Installing Nginx..."
-                            if [ -f /etc/debian_version ]; then
-                                sudo apt update && sudo apt install nginx -y
-                            elif [ -f /etc/redhat-release ]; then
-                                sudo yum install nginx -y
-                            fi
+                    sh '''
+                        if ! command -v nginx >/dev/null; then
+                            echo 🛠️ Installing Nginx...
+                            sudo apt update
+                            sudo apt install -y nginx
                         else
-                            echo "✅ Nginx already installed."
+                            echo ✅ Nginx already installed.
                         fi
 
                         sudo systemctl enable nginx
                         sudo systemctl start nginx
-                    """
+                    '''
                 }
             }
         }
@@ -38,29 +37,26 @@ pipeline {
         stage('Configure Nginx Site') {
             steps {
                 script {
-                    sh """
-                        echo "🔧 Setting up Nginx site config..."
+                    sh '''
+                        echo 🔧 Setting up Nginx site config...
+                        sudo mkdir -p ${DEPLOY_DIR}
 
-                        sudo mkdir -p \$DEPLOY_DIR
-
-                        sudo bash -c 'cat > \$NGINX_CONF' <<EOF
+                        sudo bash -c 'cat > ${NGINX_CONF}' <<EOF
 server {
     listen 80;
     server_name _;
 
-    root \$DEPLOY_DIR;
+    root ${DEPLOY_DIR};
     index index.html;
 
     location / {
-        try_files \$uri \$uri/ =404;
+        try_files \\$uri \\$uri/ =404;
     }
 }
 EOF
 
-                        sudo ln -sf \$NGINX_CONF /etc/nginx/sites-enabled/pikniknow-web
-                        sudo rm -f /etc/nginx/sites-enabled/default || true
-                        sudo nginx -t
-                    """
+                        sudo ln -sf ${NGINX_CONF} ${NGINX_SITE_LINK}
+                    '''
                 }
             }
         }
@@ -68,28 +64,30 @@ EOF
         stage('Deploy Website') {
             steps {
                 script {
-                    sh """
-                        echo "🚀 Deploying website..."
-
-                        sudo rm -rf \$DEPLOY_DIR/*
-                        sudo rsync -av --exclude='.git' --exclude='Jenkinsfile' ./ \$DEPLOY_DIR/
-                        sudo chown -R www-data:www-data \$DEPLOY_DIR
-                        sudo chmod -R 755 \$DEPLOY_DIR
-                    """
+                    sh '''
+                        echo 📂 Copying website files to ${DEPLOY_DIR}...
+                        sudo cp -r * ${DEPLOY_DIR}
+                        sudo chown -R www-data:www-data ${DEPLOY_DIR}
+                    '''
                 }
             }
         }
 
         stage('Restart Nginx') {
             steps {
-                sh 'sudo systemctl restart nginx'
+                script {
+                    sh '''
+                        echo 🔄 Restarting Nginx...
+                        sudo nginx -t && sudo systemctl restart nginx
+                    '''
+                }
             }
         }
     }
 
     post {
         success {
-            echo '✅ Deployment successful!'
+            echo '✅ Deployment completed successfully!'
         }
         failure {
             echo '❌ Deployment failed!'
