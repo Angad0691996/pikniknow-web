@@ -12,6 +12,27 @@ pipeline {
             }
         }
 
+        stage('Install Nginx if Missing') {
+            steps {
+                script {
+                    sh """
+                        if ! command -v nginx > /dev/null; then
+                            echo "🔧 Installing Nginx..."
+                            if [ -f /etc/debian_version ]; then
+                                sudo apt update && sudo apt install nginx -y
+                            elif [ -f /etc/redhat-release ]; then
+                                sudo yum install nginx -y
+                            fi
+                        else
+                            echo "✅ Nginx already installed."
+                        fi
+                        sudo systemctl enable nginx
+                        sudo systemctl start nginx
+                    """
+                }
+            }
+        }
+
         stage('Deploy Website') {
             steps {
                 script {
