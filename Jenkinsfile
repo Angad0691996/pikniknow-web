@@ -2,7 +2,7 @@ pipeline {
     agent any
 
     environment {
-        REPO_URL = "https://github.com/Angad0691996/pikniknow-web.git"
+        REPO_URL = "https://github.com/Angad0691996/pikniknow-web..git"
         NGINX_CONF = "/etc/nginx/sites-available/pikniknow"
     }
 
