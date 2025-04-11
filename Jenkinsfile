@@ -37,19 +37,64 @@ pipeline {
             steps {
                 script {
                     sh """
-                        echo "📝 Writing Nginx site config..."
-                        cat <<EOF | sudo tee /etc/nginx/sites-available/pikniknow-web
+                        echo "🛠 Creating Nginx config for pikniknow-web..."
+
+                        sudo bash -c 'cat > /etc/nginx/sites-available/pikniknow-web <<EOF
 server {
     listen 80;
     server_name _;
 
-    root $DEPLOY_DIR;
+    root ${DEPLOY_DIR};
     index index.html;
 
     location / {
         try_files \$uri \$uri/ =404;
     }
 }
-EOF
-                        echo "🔗 Enabling site and disabling default..."
-                        sudo ln -sf /etc/nginx/sites-available/pikniknow-web /etc/ng
+EOF'
+
+                        sudo ln -sf /etc/nginx/sites-available/pikniknow-web /etc/nginx/sites-enabled/pikniknow-web
+                        sudo rm -f /etc/nginx/sites-enabled/default || true
+                        sudo nginx -t && sudo systemctl reload nginx
+                    """
+                }
+            }
+        }
+
+        stage('Deploy Website') {
+            steps {
+                script {
+                    sh """
+                        echo "📁 Ensuring deploy directory exists..."
+                        sudo mkdir -p \$DEPLOY_DIR
+
+                        echo "🧹 Clearing old site..."
+                        sudo rm -rf \$DEPLOY_DIR/*
+
+                        echo "🚀 Deploying new site..."
+                        sudo rsync -av --exclude='.git' --exclude='Jenkinsfile' ./ \$DEPLOY_DIR/
+
+                        sudo chown -R www-data:www-data \$DEPLOY_DIR
+                    """
+                }
+            }
+        }
+
+        stage('Restart Nginx') {
+            steps {
+                script {
+                    sh "sudo systemctl restart nginx"
+                }
+            }
+        }
+    }
+
+    post {
+        success {
+            echo '✅ Deployment successful!'
+        }
+        failure {
+            echo '❌ Deployment failed!'
+        }
+    }
+}
