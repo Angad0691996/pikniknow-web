@@ -4,6 +4,7 @@ pipeline {
     environment {
         REPO_URL = "https://github.com/Angad0691996/pikniknow-web..git"
         NGINX_CONF = "/etc/nginx/sites-available/pikniknow"
+        DEPLOY_DIR = "/var/www/pikniknow-web"
     }
 
     stages {
@@ -13,14 +14,31 @@ pipeline {
             }
         }
 
+        stage('Install Dependencies') {
+            steps {
+                echo "📦 Installing Node and npm..."
+                sh """
+                    curl -fsSL https://deb.nodesource.com/setup_18.x | sudo -E bash -
+                    sudo apt-get install -y nodejs
+                """
+            }
+        }
+
+        stage('Build React App') {
+            steps {
+                echo "🛠️ Building React frontend..."
+                sh """
+                    npm install
+                    npm run build
+                """
+            }
+        }
+
         stage('Install Nginx if Missing') {
             steps {
                 script {
                     def nginxInstalled = sh(script: "command -v nginx", returnStatus: true) == 0
-                    if (nginxInstalled) {
-                        echo "✅ Nginx already installed."
-                    } else {
-                        echo "📦 Installing Nginx..."
+                    if (!nginxInstalled) {
                         sh "sudo apt update && sudo apt install -y nginx"
                     }
                     sh "sudo systemctl enable nginx"
@@ -31,40 +49,34 @@ pipeline {
 
         stage('Configure Nginx Site') {
             steps {
-                script {
-                    echo "🔧 Setting up Nginx site config..."
-
-                    sh """
-                    sudo mkdir -p /var/www/pikniknow-web
-                    sudo cp -r * /var/www/pikniknow-web/
+                echo "🔧 Configuring Nginx site..."
+                sh """
+                    sudo mkdir -p ${DEPLOY_DIR}
+                    sudo cp -r build/* ${DEPLOY_DIR}/
 
                     cat <<EOF | sudo tee ${NGINX_CONF}
 server {
     listen 80;
     server_name _;
 
-    root /var/www/pikniknow-web;
+    root ${DEPLOY_DIR};
     index index.html;
 
     location / {
-        try_files \$uri \$uri/ =404;
+        try_files \$uri /index.html;
     }
 }
 EOF
-                    sudo ln -sf ${NGINX_CONF} /etc/nginx/sites-enabled/pikniknow
-                    """
-                }
-            }
-        }
 
-        stage('Deploy Website') {
-            steps {
-                echo "🚀 Deploying website to /var/www/pikniknow-web"
+                    sudo ln -sf ${NGINX_CONF} /etc/nginx/sites-enabled/pikniknow
+                    sudo rm -f /etc/nginx/sites-enabled/default
+                """
             }
         }
 
         stage('Restart Nginx') {
             steps {
+                sh "sudo nginx -t"
                 sh "sudo systemctl restart nginx"
                 echo "🔁 Nginx restarted"
             }
