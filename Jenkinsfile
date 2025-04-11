@@ -8,7 +8,7 @@ pipeline {
     stages {
         stage('Checkout Code') {
             steps {
-                git credentialsId: 'github-credentials', url: 'https://github.com/Angad0691996/pikniknow-web..git', branch: 'main'
+                git credentialsId: 'github-credentials', url: 'https://github.com/Angad0691996/pikniknow-web.git', branch: 'main'
             }
         }
 
@@ -33,40 +33,23 @@ pipeline {
             }
         }
 
-        stage('Deploy Website') {
+        stage('Configure Nginx Site') {
             steps {
                 script {
                     sh """
-                        echo "Ensuring deploy directory exists..."
-                        sudo mkdir -p \$DEPLOY_DIR
+                        echo "📝 Writing Nginx site config..."
+                        cat <<EOF | sudo tee /etc/nginx/sites-available/pikniknow-web
+server {
+    listen 80;
+    server_name _;
 
-                        echo "Clearing old site..."
-                        sudo rm -rf \$DEPLOY_DIR/*
+    root $DEPLOY_DIR;
+    index index.html;
 
-                        echo "Deploying new site..."
-                        sudo rsync -av --exclude='.git' --exclude='Jenkinsfile' ./ \$DEPLOY_DIR/
-
-                        sudo chown -R www-data:www-data \$DEPLOY_DIR
-                    """
-                }
-            }
-        }
-
-        stage('Restart Nginx') {
-            steps {
-                script {
-                    sh "sudo systemctl restart nginx"
-                }
-            }
-        }
-    }
-
-    post {
-        success {
-            echo '✅ Deployment successful!'
-        }
-        failure {
-            echo '❌ Deployment failed!'
-        }
+    location / {
+        try_files \$uri \$uri/ =404;
     }
 }
+EOF
+                        echo "🔗 Enabling site and disabling default..."
+                        sudo ln -sf /etc/nginx/sites-available/pikniknow-web /etc/ng
