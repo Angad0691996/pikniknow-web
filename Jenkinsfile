@@ -16,11 +16,15 @@ pipeline {
             steps {
                 script {
                     sh """
+                        echo "Ensuring deploy directory exists..."
+                        sudo mkdir -p \$DEPLOY_DIR
+
                         echo "Clearing old site..."
                         sudo rm -rf \$DEPLOY_DIR/*
-                        
+
                         echo "Deploying new site..."
-                        sudo cp -r * \$DEPLOY_DIR/
+                        sudo rsync -av --exclude='.git' --exclude='Jenkinsfile' ./ \$DEPLOY_DIR/
+
                         sudo chown -R www-data:www-data \$DEPLOY_DIR
                     """
                 }
@@ -38,10 +42,10 @@ pipeline {
 
     post {
         success {
-            echo 'Deployment successful!'
+            echo '✅ Deployment successful!'
         }
         failure {
-            echo 'Deployment failed!'
+            echo '❌ Deployment failed!'
         }
     }
 }
