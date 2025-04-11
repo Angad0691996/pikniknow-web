@@ -3,12 +3,13 @@ pipeline {
 
     environment {
         DEPLOY_DIR = "/var/www/pikniknow-web"
+        NGINX_CONF = "/etc/nginx/sites-available/pikniknow-web"
     }
 
     stages {
         stage('Checkout Code') {
             steps {
-                git credentialsId: 'github-credentials', url: 'https://github.com/Angad0691996/pikniknow-web..git', branch: 'main'
+                git credentialsId: 'github-credentials', url: 'https://github.com/Angad0691996/pikniknow-web.git', branch: 'main'
             }
         }
 
@@ -26,6 +27,7 @@ pipeline {
                         else
                             echo "✅ Nginx already installed."
                         fi
+
                         sudo systemctl enable nginx
                         sudo systemctl start nginx
                     """
@@ -37,25 +39,27 @@ pipeline {
             steps {
                 script {
                     sh """
-                        echo "🛠 Creating Nginx config for pikniknow-web..."
+                        echo "🔧 Setting up Nginx site config..."
 
-                        sudo bash -c 'cat > /etc/nginx/sites-available/pikniknow-web <<EOF
+                        sudo mkdir -p \$DEPLOY_DIR
+
+                        sudo bash -c 'cat > \$NGINX_CONF' <<EOF
 server {
     listen 80;
     server_name _;
 
-    root ${DEPLOY_DIR};
+    root \$DEPLOY_DIR;
     index index.html;
 
     location / {
         try_files \$uri \$uri/ =404;
     }
 }
-EOF'
+EOF
 
-                        sudo ln -sf /etc/nginx/sites-available/pikniknow-web /etc/nginx/sites-enabled/pikniknow-web
+                        sudo ln -sf \$NGINX_CONF /etc/nginx/sites-enabled/pikniknow-web
                         sudo rm -f /etc/nginx/sites-enabled/default || true
-                        sudo nginx -t && sudo systemctl reload nginx
+                        sudo nginx -t
                     """
                 }
             }
@@ -65,16 +69,12 @@ EOF'
             steps {
                 script {
                     sh """
-                        echo "📁 Ensuring deploy directory exists..."
-                        sudo mkdir -p \$DEPLOY_DIR
+                        echo "🚀 Deploying website..."
 
-                        echo "🧹 Clearing old site..."
                         sudo rm -rf \$DEPLOY_DIR/*
-
-                        echo "🚀 Deploying new site..."
                         sudo rsync -av --exclude='.git' --exclude='Jenkinsfile' ./ \$DEPLOY_DIR/
-
                         sudo chown -R www-data:www-data \$DEPLOY_DIR
+                        sudo chmod -R 755 \$DEPLOY_DIR
                     """
                 }
             }
@@ -82,9 +82,7 @@ EOF'
 
         stage('Restart Nginx') {
             steps {
-                script {
-                    sh "sudo systemctl restart nginx"
-                }
+                sh 'sudo systemctl restart nginx'
             }
         }
     }
