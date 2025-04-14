@@ -1,8 +1,9 @@
 pipeline {
     agent any
-    
+
     environment {
-        DEPLOY_DIR = '/var/www/html/pikniknow-web'
+        NGINX_SITE_CONF = '/etc/nginx/sites-available/pikniknow-web'
+        NGINX_ENABLED_LINK = '/etc/nginx/sites-enabled/pikniknow-web'
     }
 
     stages {
@@ -11,12 +12,14 @@ pipeline {
                 checkout scm
             }
         }
-        
+
         stage('Install Nginx if Missing') {
             steps {
                 script {
-                    if (!fileExists('/etc/nginx/nginx.conf')) {
-                        echo 'Nginx is not installed. Installing Nginx...'
+                    // Check if Nginx is installed
+                    def nginxInstalled = sh(script: 'which nginx', returnStatus: true)
+                    if (nginxInstalled != 0) {
+                        echo 'Nginx is not installed, installing...'
                         sh 'sudo apt-get update && sudo apt-get install -y nginx'
                     } else {
                         echo 'Nginx is already installed.'
@@ -24,45 +27,47 @@ pipeline {
                 }
             }
         }
-        
+
         stage('Configure Nginx Site') {
             steps {
                 script {
-                    def siteConfig = '''
+                    // Create the configuration file for the site
+                    writeFile file: NGINX_SITE_CONF, text: '''
                     server {
                         listen 80;
-                        server_name localhost;
-
-                        root /var/www/html/pikniknow-web;
-                        index index.html;
+                        server_name yourdomain.com;
 
                         location / {
-                            try_files $uri $uri/ =404;
+                            root /var/www/html;
+                            index index.html index.htm;
                         }
                     }
                     '''
-                    // Use sudo to write to the Nginx configuration directory
-                    sh 'echo "${siteConfig}" | sudo tee /etc/nginx/sites-available/pikniknow-web'
-                    sh 'sudo ln -s /etc/nginx/sites-available/pikniknow-web /etc/nginx/sites-enabled/'
-                    sh 'sudo nginx -t'
+
+                    // Check if the symbolic link exists before creating it
+                    sh """
+                    if [ ! -L ${NGINX_ENABLED_LINK} ]; then
+                        sudo ln -s ${NGINX_SITE_CONF} ${NGINX_ENABLED_LINK}
+                    else
+                        echo 'Symbolic link already exists, skipping creation.'
+                    fi
+                    """
                 }
             }
         }
-        
+
         stage('Deploy Website') {
             steps {
-                echo 'Deploying HTML files to Nginx'
-                sh 'sudo cp -r * /var/www/html/pikniknow-web'
-                sh 'sudo chown -R www-data:www-data /var/www/html/pikniknow-web'
-                sh 'sudo systemctl restart nginx'
+                script {
+                    // Reload Nginx to apply the changes
+                    sh 'sudo systemctl reload nginx'
+                    echo 'Deployment completed!'
+                }
             }
         }
     }
-    
+
     post {
-        success {
-            echo 'Deployment successful!'
-        }
         failure {
             echo '❌ Deployment failed!'
         }
