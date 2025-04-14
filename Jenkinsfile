@@ -4,6 +4,7 @@ pipeline {
     environment {
         NGINX_SITE_CONF = '/etc/nginx/sites-available/pikniknow-web'
         NGINX_ENABLED_LINK = '/etc/nginx/sites-enabled/pikniknow-web'
+        TEMP_CONF = 'pikniknow-temp.conf'
     }
 
     stages {
@@ -16,7 +17,6 @@ pipeline {
         stage('Install Nginx if Missing') {
             steps {
                 script {
-                    // Check if Nginx is installed
                     def nginxInstalled = sh(script: 'which nginx', returnStatus: true)
                     if (nginxInstalled != 0) {
                         echo 'Nginx is not installed, installing...'
@@ -31,26 +31,27 @@ pipeline {
         stage('Configure Nginx Site') {
             steps {
                 script {
-                    // Create the configuration file for the site
-                    writeFile file: NGINX_SITE_CONF, text: '''
-                    server {
-                        listen 80;
-                        server_name yourdomain.com;
+                    // Write config to workspace (Jenkins has permission here)
+                    writeFile file: TEMP_CONF, text: '''
+server {
+    listen 80;
+    server_name yourdomain.com;
 
-                        location / {
-                            root /var/www/html;
-                            index index.html index.htm;
-                        }
-                    }
-                    '''
+    location / {
+        root /var/www/html;
+        index index.html index.htm;
+    }
+}
+                    '''.trim()
 
-                    // Check if the symbolic link exists before creating it
+                    // Move config with sudo
                     sh """
-                    if [ ! -L ${NGINX_ENABLED_LINK} ]; then
-                        sudo ln -s ${NGINX_SITE_CONF} ${NGINX_ENABLED_LINK}
-                    else
-                        echo 'Symbolic link already exists, skipping creation.'
-                    fi
+                        sudo cp ${TEMP_CONF} ${NGINX_SITE_CONF}
+                        if [ ! -L ${NGINX_ENABLED_LINK} ]; then
+                            sudo ln -s ${NGINX_SITE_CONF} ${NGINX_ENABLED_LINK}
+                        else
+                            echo 'Symbolic link already exists, skipping creation.'
+                        fi
                     """
                 }
             }
@@ -58,11 +59,8 @@ pipeline {
 
         stage('Deploy Website') {
             steps {
-                script {
-                    // Reload Nginx to apply the changes
-                    sh 'sudo systemctl reload nginx'
-                    echo 'Deployment completed!'
-                }
+                sh 'sudo systemctl reload nginx'
+                echo '✅ Deployment completed!'
             }
         }
     }
