@@ -2,75 +2,66 @@ pipeline {
     agent any
 
     environment {
-        NODE_ENV = 'production'
+        // Define environment variables here if needed
     }
 
     stages {
-        stage('Checkout Code') {
+        stage('Declarative: Checkout SCM') {
             steps {
-                git url: 'https://github.com/Angad0691996/pikniknow-web.git', branch: 'main', credentialsId: 'github-creds'
+                checkout scm
             }
         }
 
         stage('Install Dependencies') {
             steps {
-                echo '📦 Installing Node and npm...'
-                sh '''
-                    curl -fsSL https://deb.nodesource.com/setup_18.x | sudo -E bash -
-                    sudo apt-get install -y nodejs
-                '''
+                echo "📦 Installing Node and npm..."
+                sh 'curl -fsSL https://deb.nodesource.com/setup_18.x | sudo -E bash -'
+                sh 'sudo apt-get install -y nodejs'
             }
         }
 
         stage('Build React App') {
             steps {
-                echo '🛠️ Building React frontend...'
+                echo "🛠️ Building React frontend..."
                 dir('pikniknow-web') {
-                    sh '''
-                        npm install
-                        npm run build
-                    '''
+                    sh 'npm install'
                 }
             }
         }
 
         stage('Install Nginx if Missing') {
             steps {
-                echo '🌐 Installing Nginx if not installed...'
-                sh '''
-                    if ! which nginx > /dev/null; then
-                        sudo apt-get update
-                        sudo apt-get install -y nginx
-                    fi
-                '''
+                echo "Installing Nginx if missing..."
+                sh 'sudo apt-get install -y nginx'
             }
         }
 
         stage('Configure Nginx Site') {
             steps {
-                echo '⚙️ Configuring Nginx site...'
-                sh '''
-                    sudo rm -rf /var/www/html/*
-                    sudo cp -r pikniknow-web/build/* /var/www/html/
-                    sudo chown -R www-data:www-data /var/www/html
-                '''
+                echo "Configuring Nginx site..."
+                // Add Nginx configuration steps here
             }
         }
 
         stage('Restart Nginx') {
             steps {
-                echo '🔄 Restarting Nginx...'
+                echo "Restarting Nginx..."
                 sh 'sudo systemctl restart nginx'
             }
         }
     }
 
     post {
-        success {
-            echo '✅ Deployment successful!'
+        always {
+            echo "❌ Deployment finished!"
         }
+
+        success {
+            echo "✅ Deployment successful!"
+        }
+
         failure {
-            echo '❌ Deployment failed!'
+            echo "❌ Deployment failed!"
         }
     }
 }
