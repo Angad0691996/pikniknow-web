@@ -34,11 +34,12 @@ pipeline {
                     def nginxConf = """
                     server {
                         listen 80;
-                        server_name _;
+                        server_name _;  # Uses a wildcard for any server name
 
                         location / {
                             root ${env.WEB_ROOT};
                             index index.html index.htm;
+                            try_files \$uri \$uri/ =404;
                         }
                     }
                     """.stripIndent()
