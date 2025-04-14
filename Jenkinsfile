@@ -41,7 +41,8 @@ pipeline {
                         }
                     }
                     '''
-                    writeFile file: '/etc/nginx/sites-available/pikniknow-web', text: siteConfig
+                    // Use sudo to write to the Nginx configuration directory
+                    sh 'echo "${siteConfig}" | sudo tee /etc/nginx/sites-available/pikniknow-web'
                     sh 'sudo ln -s /etc/nginx/sites-available/pikniknow-web /etc/nginx/sites-enabled/'
                     sh 'sudo nginx -t'
                 }
