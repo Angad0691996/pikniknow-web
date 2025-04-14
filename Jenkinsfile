@@ -2,13 +2,13 @@ pipeline {
     agent any
 
     environment {
-        WEB_DIR = '/var/www/html'
-        ASSETS_DIR = '/var/lib/jenkins/workspace/pikniknow-web-pipeline/assets'
+        // You can specify your environment variables here if needed
     }
 
     stages {
-        stage('Checkout SCM') {
+        stage('Declarative: Checkout SCM') {
             steps {
+                // Checkout the repository
                 checkout scm
             }
         }
@@ -17,13 +17,7 @@ pipeline {
             steps {
                 script {
                     // Check if Nginx is installed
-                    def nginxInstalled = sh(script: 'which nginx', returnStatus: true) == 0
-                    if (!nginxInstalled) {
-                        echo 'Nginx is not installed. Installing...'
-                        sh 'sudo apt update && sudo apt install -y nginx'
-                    } else {
-                        echo 'Nginx is already installed.'
-                    }
+                    sh 'which nginx || sudo apt-get install -y nginx'
                 }
             }
         }
@@ -31,8 +25,10 @@ pipeline {
         stage('Configure Nginx Site') {
             steps {
                 script {
-                    // Copy Nginx configuration
-                    sh 'sudo cp /var/lib/jenkins/workspace/pikniknow-web-pipeline/pikniknow-web /etc/nginx/sites-available/pikniknow-web'
+                    // Copy Nginx configuration (with recursive flag)
+                    sh 'sudo cp -r /var/lib/jenkins/workspace/pikniknow-web-pipeline/pikniknow-web /etc/nginx/sites-available/pikniknow-web'
+
+                    // Create the symlink in the sites-enabled directory
                     sh 'sudo ln -sf /etc/nginx/sites-available/pikniknow-web /etc/nginx/sites-enabled/'
 
                     // Reload Nginx to apply the new configuration
@@ -44,26 +40,33 @@ pipeline {
         stage('Deploy Website') {
             steps {
                 script {
-                    // Copy assets folder to /var/www/html
-                    sh "sudo cp -r ${ASSETS_DIR} ${WEB_DIR}"
+                    // Copy the website content to the web root
+                    sh 'sudo cp -r /var/lib/jenkins/workspace/pikniknow-web-pipeline/* /var/www/html/'
 
-                    // Set correct permissions on assets
-                    sh "sudo chmod -R 755 ${WEB_DIR}/assets"
-                    sh "sudo chown -R www-data:www-data ${WEB_DIR}/assets"
-
-                    // Reload Nginx to apply changes
-                    sh 'sudo systemctl reload nginx'
-
-                    echo '✅ Deployment completed!'
+                    // Set proper permissions for web assets
+                    sh 'sudo chmod -R 755 /var/www/html'
                 }
+            }
+        }
+
+        stage('Declarative: Post Actions') {
+            steps {
+                echo 'Cleaning up...'
+                // Any post-action tasks can be added here
             }
         }
     }
 
     post {
         always {
-            echo 'Cleaning up...'
-            // Optional: Clean up workspace or perform any final steps
+            // Cleanup actions after pipeline execution (optional)
+            echo 'Pipeline execution finished.'
+        }
+        success {
+            echo 'Deployment was successful!'
+        }
+        failure {
+            echo 'Pipeline failed!'
         }
     }
 }
