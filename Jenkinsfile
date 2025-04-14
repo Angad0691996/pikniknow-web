@@ -25,10 +25,12 @@ pipeline {
         stage('Build React App') {
             steps {
                 echo '🛠️ Building React frontend...'
-                sh '''
-                    npm install
-                    npm run build
-                '''
+                dir('pikniknow-web') {
+                    sh '''
+                        npm install
+                        npm run build
+                    '''
+                }
             }
         }
 
@@ -49,7 +51,7 @@ pipeline {
                 echo '⚙️ Configuring Nginx site...'
                 sh '''
                     sudo rm -rf /var/www/html/*
-                    sudo cp -r build/* /var/www/html/
+                    sudo cp -r pikniknow-web/build/* /var/www/html/
                     sudo chown -R www-data:www-data /var/www/html
                 '''
             }
