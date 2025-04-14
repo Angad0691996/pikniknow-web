@@ -1,10 +1,6 @@
 pipeline {
     agent any
 
-    environment {
-        // You can specify your environment variables here if needed
-    }
-
     stages {
         stage('Declarative: Checkout SCM') {
             steps {
