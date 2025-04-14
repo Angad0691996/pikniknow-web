@@ -2,9 +2,9 @@ pipeline {
     agent any
 
     environment {
-        NGINX_SITE_CONF = '/etc/nginx/sites-available/pikniknow-web'
-        NGINX_ENABLED_LINK = '/etc/nginx/sites-enabled/pikniknow-web'
-        TEMP_CONF = 'pikniknow-temp.conf'
+        NGINX_CONF_PATH = "/etc/nginx/sites-available/pikniknow-web"
+        NGINX_LINK_PATH = "/etc/nginx/sites-enabled/pikniknow-web"
+        WEB_ROOT = "/var/www/html"
     }
 
     stages {
@@ -17,12 +17,12 @@ pipeline {
         stage('Install Nginx if Missing') {
             steps {
                 script {
-                    def nginxInstalled = sh(script: 'which nginx', returnStatus: true)
-                    if (nginxInstalled != 0) {
-                        echo 'Nginx is not installed, installing...'
-                        sh 'sudo apt-get update && sudo apt-get install -y nginx'
+                    def nginxInstalled = sh(script: 'which nginx', returnStatus: true) == 0
+                    if (!nginxInstalled) {
+                        echo "Installing Nginx..."
+                        sh 'sudo apt update && sudo apt install -y nginx'
                     } else {
-                        echo 'Nginx is already installed.'
+                        echo "Nginx is already installed."
                     }
                 }
             }
@@ -31,26 +31,26 @@ pipeline {
         stage('Configure Nginx Site') {
             steps {
                 script {
-                    // Write config to workspace (Jenkins has permission here)
-                    writeFile file: TEMP_CONF, text: '''
-server {
-    listen 80;
-    server_name yourdomain.com;
+                    def nginxConf = """
+                    server {
+                        listen 80;
+                        server_name _;
 
-    location / {
-        root /var/www/html;
-        index index.html index.htm;
-    }
-}
-                    '''.trim()
+                        location / {
+                            root ${env.WEB_ROOT};
+                            index index.html index.htm;
+                        }
+                    }
+                    """.stripIndent()
 
-                    // Move config with sudo
+                    writeFile file: 'pikniknow-temp.conf', text: nginxConf
+
                     sh """
-                        sudo cp ${TEMP_CONF} ${NGINX_SITE_CONF}
-                        if [ ! -L ${NGINX_ENABLED_LINK} ]; then
-                            sudo ln -s ${NGINX_SITE_CONF} ${NGINX_ENABLED_LINK}
+                        sudo cp pikniknow-temp.conf ${env.NGINX_CONF_PATH}
+                        if [ ! -L ${env.NGINX_LINK_PATH} ]; then
+                            sudo ln -s ${env.NGINX_CONF_PATH} ${env.NGINX_LINK_PATH}
                         else
-                            echo 'Symbolic link already exists, skipping creation.'
+                            echo "Symbolic link already exists, skipping creation."
                         fi
                     """
                 }
@@ -59,15 +59,17 @@ server {
 
         stage('Deploy Website') {
             steps {
-                sh 'sudo systemctl reload nginx'
-                echo '✅ Deployment completed!'
+                script {
+                    sh 'sudo systemctl reload nginx'
+                    echo "✅ Deployment completed!"
+                }
             }
         }
     }
 
     post {
         failure {
-            echo '❌ Deployment failed!'
+            echo "❌ Deployment failed!"
         }
     }
 }
