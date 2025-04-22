@@ -2,12 +2,12 @@ pipeline {
     agent { label 'pikniknow' }
 
     environment {
-        SITE_DIR = '/var/www/pikniknow'
+        SITE_DIR = '/var/www/html'
     }
 
     options {
-        timestamps()             // Show timestamps in console output
-        skipDefaultCheckout()    // We'll manually clone the repo
+        timestamps()
+        skipDefaultCheckout()
     }
 
     stages {
@@ -21,7 +21,7 @@ pipeline {
         stage("📥 Clone GitHub Repo") {
             steps {
                 echo "Cloning the latest static site code from GitHub"
-                git url: "https://github.com/Angad0691996/pikniknow-web.git", branch: "main", credentialsId: 'github-creds'
+                git credentialsId: 'github-creds', url: 'https://github.com/Angad0691996/pikniknow-web.git', branch: 'main'
             }
         }
 
@@ -40,10 +40,10 @@ pipeline {
 
     post {
         success {
-            echo "✅ Deployment completed successfully!"
+            echo "✅ Deployment completed successfully! Visit http://43.204.228.77/"
         }
         failure {
-            echo "❌ Deployment failed. Check the console output for details."
+            echo "❌ Deployment failed. Check console output for details."
         }
     }
 }
